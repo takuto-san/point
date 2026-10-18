@@ -4,9 +4,7 @@
 
 他社解約金還元申請の精査結果を受信し、担当者による確認・確定と顧客への結果通知を支える管理システム。L3環境で証跡解析・本人確認・ポイント付与判定を行い、許可された結果だけを管理システムへ連携する。
 
-![解約金還元申請システムの全体像](docs/point-award-system-overview-with-screens.png)
-
-[SVG](docs/point-award-system-overview-with-screens.svg) ／ [HTML](docs/point-award-system-overview-with-screens.html)
+![解約金還元申請システムの全体像](docs/system-overview.png)
 
 ## 1. 依存関係
 
@@ -51,13 +49,9 @@ point/
 │       └── lambda/*.mjs.tmpl
 └── docs/
     ├── architecture-aws.drawio
-    ├── architecture-aws.png
-    ├── architecture-aws.svg
-    └── point-award-system-overview-with-screens.{html,png,svg}
+    └── system-overview.png
 ```
 
 ## 4. AWS構成図
 
-![AWS構成図](docs/architecture-aws.png)
-
-[draw.io](docs/architecture-aws.drawio) ／ [SVG](docs/architecture-aws.svg)
+[AWS構成図（draw.io）](docs/architecture-aws.drawio)
