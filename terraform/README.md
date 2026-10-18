@@ -38,6 +38,6 @@ OpenAPIをzip作成時に同梱し、許可項目・型・必須項目を共通�
 
 ## 構成図
 
-READMEのAWS構成図はL3・管理アカウントを合わせた共通設計図。`bash tools/diagram.sh` でTerravisionの設計定義（`docs/architecture.tvg.json`）から生成し、追加予定のL3リソースも表示する。この管理側Terraformにそれらのリソースが追加されたわけではない。
+READMEのAWS構成図はL3・管理アカウントを合わせた共通設計図。プロジェクトルートで `bash tools/diagram.sh` を実行すると、設計定義（`docs/architecture.tvg.json`）から編集可能なdraw.ioファイルを生成する。追加予定のL3リソースも表示するが、この管理側Terraformにそれらのリソースが追加されたわけではない。READMEのPNG/SVGプレビューは `bash tools/diagram-preview.sh` で再生成できる。
 
 このTerraformのplanから管理アカウントの定義だけを確認する場合は、プロジェクトルートで `bash tools/diagram-terraform.sh` を実行する。仮プロファイルの一時コピーを使い、`docs/terraform-architecture-aws.dot.png` / `.svg` を出力する。実インフラ・state・README用の共通図は変更しない。
