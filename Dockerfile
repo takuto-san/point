@@ -2,6 +2,10 @@
 
 FROM swaggerapi/swagger-ui:v5.33.1
 
+LABEL org.opencontainers.image.title="point-management-openapi" \
+      org.opencontainers.image.description="Swagger UI for the point management OpenAPI contract" \
+      org.opencontainers.image.source="https://github.com/takuto-san/point"
+
 COPY --chmod=0444 openapi.yml /spec/openapi.yml
 RUN chmod 0555 /spec
 
