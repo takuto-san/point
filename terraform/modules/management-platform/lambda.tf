@@ -1,9 +1,9 @@
 data "archive_file" "receiver" {
   type        = "zip"
-  output_path = "${path.module}/receiver.zip"
+  output_path = "${path.root}/receiver.zip"
 
   dynamic "source" {
-    for_each = fileset("${path.module}/lambda", "*.mjs")
+    for_each = fileset("${path.module}/files/lambda", "*.mjs")
     content {
       filename = source.value
       content  = file("${path.module}/files/lambda/${source.value}")
@@ -12,7 +12,7 @@ data "archive_file" "receiver" {
 
   source {
     filename = "openapi.json"
-    content  = jsonencode(yamldecode(file("${path.module}/../openapi.yml")))
+    content  = jsonencode(yamldecode(var.openapi_document))
   }
 }
 

@@ -40,11 +40,13 @@ variable "l3_account_id" {
 }
 
 variable "log_retention_days" {
-  type    = number
-  default = 30
+  description = "CloudWatch Logsの保持日数。"
+  type        = number
+  default     = 30
 }
 
 variable "tags" {
-  type    = map(string)
-  default = {}
+  description = "全AWSリソースへ付与する追加タグ。"
+  type        = map(string)
+  default     = {}
 }

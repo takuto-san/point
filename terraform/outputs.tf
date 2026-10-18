@@ -1,19 +1,24 @@
 output "management_account_id" {
-  value = var.management_account_id
+  description = "管理システム用AWSアカウントID。"
+  value       = var.management_account_id
 }
 
 output "management_api_base_url" {
-  value = "${aws_apigatewayv2_api.management.api_endpoint}/v1"
+  description = "管理APIのベースURL。"
+  value       = module.management_platform.management_api_base_url
 }
 
 output "management_event_bus_arn" {
-  value = aws_cloudwatch_event_bus.l3_results.arn
+  description = "L3からの結果を受け付けるEventBridgeイベントバスARN。"
+  value       = module.management_platform.management_event_bus_arn
 }
 
 output "admin_web_domain" {
-  value = aws_cloudfront_distribution.admin_web.domain_name
+  description = "管理画面を配信するCloudFrontドメイン名。"
+  value       = module.management_platform.admin_web_domain
 }
 
 output "staff_user_pool_id" {
-  value = aws_cognito_user_pool.staff.id
+  description = "管理画面スタッフ用Cognito User Pool ID。"
+  value       = module.management_platform.staff_user_pool_id
 }

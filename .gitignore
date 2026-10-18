@@ -4,5 +4,6 @@
 *.tfplan
 *.zip
 terraform.tfvars
+terraform/environments/*.tfvars
 *.auto.tfvars
 crash.log
