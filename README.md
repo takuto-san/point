@@ -17,7 +17,6 @@
 | Terraform | 1.6.0以上 |
 | AWS CLI | v2 |
 | Swagger UI | 5.25.3 |
-| Node.js（Dockerイメージ） | 22-alpine |
 
 ## 2. セットアップ
 
@@ -31,7 +30,6 @@ cp terraform/terraform.tfvars.example terraform/terraform.tfvars
 terraform -chdir=terraform init
 terraform -chdir=terraform fmt -check
 terraform -chdir=terraform validate
-docker run --rm -v "$(pwd):/work:ro" -w /work node:22-alpine node --test tests/*.test.mjs
 ```
 
 ## 3. ディレクトリ構成
@@ -39,7 +37,7 @@ docker run --rm -v "$(pwd):/work:ro" -w /work node:22-alpine node --test tests/*
 ```text
 point/
 ├── README.md
-├── l3-management.openapi.yaml
+├── openapi.yaml
 ├── Dockerfile
 ├── docker-compose.yml
 ├── terraform/
@@ -51,8 +49,6 @@ point/
 │       ├── terraform.tfvars.example.tmpl
 │       ├── .terraform.lock.hcl.tmpl
 │       └── lambda/*.mjs.tmpl
-├── tests/
-│   └── receiver.test.mjs
 └── docs/
     ├── architecture-aws.drawio
     ├── architecture-aws.png
