@@ -132,8 +132,7 @@ point/
 ├── docker-compose.yml                 # localhost:8080
 ├── .dockerignore
 ├── .gitignore
-├── openapi/
-│   └── l3-management.openapi.yaml      # 管理側受信API・共通データ契約の正本
+├── l3-management.openapi.yaml          # 管理側受信API・共通データ契約の正本
 ├── terraform/
 │   └── README.md                       # 構成図・生成後のディレクトリ構成
 ├── tests/
@@ -182,4 +181,4 @@ terraform -chdir=terraform output -raw management_event_bus_arn
 
 通常の結果連携はEventBridge。イベントの `source` は `jp.co.nifty.point-award.l3`、`detail-type` は `AnalysisSnapshot.v1`、`detail` はOpenAPIの `AnalysisSnapshot` とする。HTTPSのPUT/GETは管理アカウント内の照会・検証用で、L3からの直接クロスアカウントHTTPS呼び出し権限は付与していない。
 
-OpenAPIの正本は [openapi/l3-management.openapi.yaml](openapi/l3-management.openapi.yaml)。point-l3のコピーは契約更新時に同じ内容へ更新する。両側のTerraform stateは独立して管理する。
+OpenAPIの正本は [l3-management.openapi.yaml](l3-management.openapi.yaml)。point-l3のコピーは契約更新時に同じ内容へ更新する。両側のTerraform stateは独立して管理する。
