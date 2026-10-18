@@ -4,37 +4,94 @@
 
 設計の基準は「管理システム」チャットの最新の全体像・画面仕様。L3内の証跡解析・本人確認・ポイント付与判定は [point-l3](https://github.com/takuto-san/point-l3)、管理側の受信・保存・配信基盤はこのリポジトリで管理する。
 
-## システム連携図
+## 環境セットアップ
 
-以下は完成時の全体像。破線は、この2リポジトリにまだ実装されていない処理・業務連携を示す。図の「申請管理システム」のうち、現在の実装は結果受信・保存まで。
+### 必要なツール
 
-```mermaid
-flowchart TB
-    Customer["お客様"] --> Form["formrun<br/>申請・証跡受付"]
+| ツール | 用途 |
+|---|---|
+| Git | ソースの取得 |
+| Docker / Docker Compose v2 | Swagger UIの起動。Docker Desktop等を起動しておく |
+| Node.js 22 | 受信処理のテスト |
+| Terraform 1.6以上 | AWS構成の初期化・検証・構築 |
+| AWS CLI v2 | AWSへ構築する場合の認証・アカウント確認 |
 
-    subgraph L3["L3アカウント：point-l3"]
-        Raw["証跡・回答データ<br/>個人情報・原本を保持"]
-        Extract["OCR・情報抽出<br/>氏名・解約金総額"]
-        Identity["本人確認<br/>回線契約者氏名と照合"]
-        Award["ポイント付与判定<br/>確認済みの業務ルールを参照"]
-        Gate["レベル間移行<br/>項目制限・マスク・持出審査"]
-        Raw -.-> Extract
-        Extract -.-> Identity
-        Extract -.-> Award
-        Identity -.-> Gate
-        Award -.-> Gate
-    end
+Swagger UIの閲覧と受信処理のテストには、AWSアカウント・認証情報は不要。
 
-    Form -.->|"Webhook（未実装）"| Raw
-    Gate -.->|"許可済み結果を順次送信（未実装）"| Admin["申請管理システム：point<br/>結果受信・一覧・詳細・確定"]
-    Staff["審査担当者"] -.->|"結果・理由を修正して「確定」"| Admin
-    Staff -.->|"原本は「formrunで開く」"| Form
-    Admin -.->|"メールリスト"| Mail["既存メール基盤"]
-    Mail -.->|"審査結果通知"| Customer
-    Mail -.->|"配信完了連携"| Admin
-    Form -.->|"申請受付：受付済み"| MyPage["既存マイページ"]
-    Admin -.->|"取込後：審査中<br/>配信完了後：結果"| MyPage
+### 1. リポジトリを取得する
+
+```bash
+git clone https://github.com/takuto-san/point.git
+cd point
 ```
+
+以下のコマンドは、特記がない限りリポジトリのルートで実行する。
+
+### 2. Swagger UIを起動する
+
+```bash
+docker compose up --build -d --wait
+docker compose ps
+```
+
+[http://localhost:8080](http://localhost:8080) を開く。これはAPI仕様の閲覧用で、管理画面や受信API本体のローカル起動ではない。停止する場合は `docker compose down` を実行する。ポートが重複する場合は `SWAGGER_PORT=18080 docker compose up --build -d --wait` で変更できる。
+
+### 3. 受信処理をテストする
+
+```bash
+node --version
+node --test tests/*.test.mjs
+```
+
+テストはNode.js標準機能で実行できるため、`npm install` は不要。
+
+### 4. Terraformを設定・検証する
+
+初回のみ設定例をコピーし、`terraform/terraform.tfvars` を編集する。既存の設定ファイルがある場合はコピーを省略する。
+
+```bash
+cp terraform/terraform.tfvars.example terraform/terraform.tfvars
+terraform -chdir=terraform init
+terraform -chdir=terraform fmt -check
+terraform -chdir=terraform validate
+```
+
+| 設定項目 | 設定する値 |
+|---|---|
+| `management_aws_profile` | 管理アカウント用AWSプロファイル名。例：`management-dev` |
+| `management_account_id` | 管理アカウントの12桁ID |
+| `l3_account_id` | 結果送信を許可するL3アカウントの12桁ID |
+| `aws_region` | 使用するリージョン。初期値：`ap-northeast-1` |
+
+設定例のアカウントIDは仮の値なので、AWSへ接続する前に実環境の値へ置き換える。`init` はプロバイダ取得のためネット接続が必要だが、`validate` までの手順にAWS認証情報は不要。`terraform.tfvars` とstateはGit管理対象外。
+
+### 5. AWSへ接続・構築する場合
+
+組織の認証手順に従って管理アカウント用プロファイルを用意し、`management_aws_profile` と同じ名前で認証する。例の `management-dev` は実際の名前に置き換える。
+
+```bash
+aws sts get-caller-identity --profile management-dev
+terraform -chdir=terraform plan -var-file=terraform.tfvars
+```
+
+表示されたアカウントIDと `management_account_id` が一致することを確認する。AWSリソースを構築する場合は、planの内容を確認してから実行する。
+
+```bash
+terraform -chdir=terraform apply -var-file=terraform.tfvars
+terraform -chdir=terraform output -raw management_event_bus_arn
+```
+
+出力したARNをpoint-l3の `management_event_bus_arn` へ設定する。構築順序は **point（管理側）→ point-l3（L3側）**。受信処理・適用の詳細は [terraform/README.md](terraform/README.md) を参照。
+
+## システム概要
+
+「管理システム」チャットでCodexのdiagram-designを使って作成した、全体構成と画面仕様の図。完成時の業務・画面仕様を示しており、現在の実装範囲は下の「実装状況」を参照。
+
+![解約金還元申請システムの全体構成と画面仕様](docs/point-award-system-overview-with-screens.png)
+
+[SVG版](docs/point-award-system-overview-with-screens.svg) ／ [編集用HTML](docs/point-award-system-overview-with-screens.html)
+
+既存図を内容変更せず掲載している。図中のTextractは当初の検討案で、現在のOCR/AIサービスは未選定。図の矢印・破線は元の凡例に従い、実装済み／未実装の区分は下の表を参照。
 
 本人確認とポイント付与判定は別々に実行し、それぞれの結果を順次管理側へ反映する。AIの判定出力は「結果・理由」のみ。担当者は詳細画面で内容を修正して「確定」する。管理側へ渡す比較情報は持出許可済みのマスク情報に限り、証跡原本はformrunで確認する。
 
@@ -48,52 +105,15 @@ flowchart TB
 
 ## AWS構成図
 
-現在のTerraformで定義している管理アカウントの構成。AWSへ適用済みの実環境を表すものではない。L3からの送信処理は別実装で、受信側のEventBridge・権限・ルールをこのリポジトリで定義している。
+管理側TerraformのplanからTerravisionで生成した構成図。仮のアカウントIDを使った設計図で、AWSへ適用済みの環境を示すものではない。
 
-```mermaid
-flowchart LR
-    L3["L3アカウント<br/>送信処理：別実装"]
-    IAMClient["管理アカウントの<br/>IAMクライアント"]
+![Terravisionで生成した管理アカウントのAWS構成図](docs/architecture-aws.dot.png)
 
-    subgraph AWS["AWS Cloud"]
-        subgraph Management["管理アカウント：point"]
-            CF["Amazon CloudFront"]
-            Web["Amazon S3<br/>管理画面の配信先・非公開"]
-            Cognito["Amazon Cognito<br/>ユーザープール・クライアント"]
-            API["API Gateway HTTP API<br/>PUT / GET・AWS_IAM認可"]
-            Bus["Amazon EventBridge<br/>結果受信バス・ルール"]
-            Queue["Amazon SQS<br/>取込キュー"]
-            Receiver["AWS Lambda<br/>受信処理を共通化"]
-            DB["Amazon DynamoDB<br/>申請・版履歴・受信票"]
-            DLQ["Amazon SQS<br/>DLQ"]
-            Logs["Amazon CloudWatch Logs"]
+[SVG版](docs/architecture-aws.dot.svg)
 
-            CF -->|"OAC経由で取得"| Web
-            API --> Receiver
-            Bus --> Queue
-            Queue --> Receiver
-            Receiver --> DB
-            Bus -->|"配信失敗"| DLQ
-            Queue -->|"再試行上限"| DLQ
-            API -->|"アクセスログ"| Logs
-            Receiver -->|"実行ログ"| Logs
-        end
-    end
+Terraformに定義されたリソースと依存関係を表示する。業務処理の全体像は上のシステム概要を参照。再生成はリポジトリルートで `bash tools/diagram.sh` を実行する。
 
-    L3 -.->|"PutEvents：送信側は未実装"| Bus
-    IAMClient -->|"SigV4"| API
-```
-
-CloudFront/S3とCognitoは画面配信・認証の基盤のみで、管理画面コードや社内IdP連携は未実装。Cognitoと受信APIの認証連携も未実装で、現在のAPIはIAM認可を使用する。LambdaはVPCに接続しない最小サーバーレス構成のため、VPC・サブネット・NATは作成しない。
-
-<details>
-<summary>TerraformからTerravisionで生成した詳細構成図</summary>
-
-![管理アカウントのAWS構成図](docs/architecture-aws.dot.png)
-
-[SVG版](docs/architecture-aws.dot.svg)。Terraform planに基づくリソース依存関係の図で、業務処理の順序は上のシステム連携図を参照。
-
-</details>
+CloudFront/S3とCognitoは画面配信・認証の基盤のみで、管理画面コードや社内IdP連携は未実装。現在の受信APIはIAM認可を使用する。LambdaはVPCに接続しない最小サーバーレス構成で、VPC・サブネット・NATは作成しない。
 
 ## ディレクトリ構成
 
@@ -130,7 +150,10 @@ point/
 │   └── diagram-providers.tf.txt        # 図生成専用の仮プロバイダ設定
 └── docs/
     ├── architecture-aws.dot.png
-    └── architecture-aws.dot.svg
+    ├── architecture-aws.dot.svg
+    ├── point-award-system-overview-with-screens.png
+    ├── point-award-system-overview-with-screens.svg
+    └── point-award-system-overview-with-screens.html
 ```
 
 生成物・ローカル設定の `.terraform/`、state、zip、`terraform.tfvars` はGit管理対象外。
@@ -148,21 +171,6 @@ point/
 | formrun Webhook、OCR、AI判定、持出審査・送信 | point-l3側の担当範囲。未実装 |
 
 計画している管理画面は「申請一覧」「申請詳細」の2画面。一覧は `申請ID → NIFTY ID → 受付日 → 本人確認 → 審査 → 通知 → 不備理由 → 解約金 → 詳細` の順に表示する。詳細はマスク済みの回線契約情報と証跡抽出情報を並べ、その下に「formrunで開く」、編集可能な「判定結果（結果・理由）」と「確定」を置く。独立した最終判定欄やメモ欄は追加しない。
-
-## ローカル起動・検証
-
-Swagger UIは仕様閲覧用で、管理画面や受信API本体のローカル起動ではない。
-
-```bash
-docker compose up --build -d
-# http://localhost:8080
-
-node --test tests/*.test.mjs
-terraform -chdir=terraform init
-terraform -chdir=terraform validate
-```
-
-Terraformの適用手順と受信処理の詳細は [terraform/README.md](terraform/README.md) を参照。
 
 ## L3との接続
 
