@@ -11,13 +11,11 @@
 | ツール | 用途 |
 |---|---|
 | Git | ソースの取得 |
-| Docker / Docker Compose v2 | Swagger UIの起動。Docker Desktop等を起動しておく |
-| Node.js 22 | 受信処理のテスト |
-| Python 3.9以上 | 編集可能なdraw.io構成図の再生成 |
-| Terraform 1.6以上 | AWS構成の初期化・検証・構築 |
-| AWS CLI v2 | AWSへ構築する場合の認証・アカウント確認 |
+| Docker / Docker Compose v2 | Swagger UI、受信処理のテスト、draw.io構成図の再生成。Docker Desktop等を起動しておく |
+| Terraform 1.6以上 | AWS構成の初期化・検証・構築を行う場合のみ |
+| AWS CLI v2 | AWSへ接続・構築する場合のみ |
 
-Swagger UIの閲覧と受信処理のテストには、AWSアカウント・認証情報は不要。
+Swagger UIの閲覧・受信処理のテスト・draw.io構成図の再生成に、ホスト側のNode.jsやPython、AWSアカウント・認証情報は不要。初回はDockerイメージの取得にネット接続が必要。
 
 ### 1. リポジトリを取得する
 
@@ -40,13 +38,13 @@ docker compose ps
 ### 3. 受信処理をテストする
 
 ```bash
-node --version
-node --test tests/*.test.mjs
+docker run --rm -v "$(pwd):/work:ro" -w /work node:22-alpine \
+  node --test tests/*.test.mjs
 ```
 
-テストはNode.js標準機能で実行できるため、`npm install` は不要。
+テストはNode.js標準機能で実行できるため、`npm install` は不要。Node.jsはコンテナ内で実行する。
 
-### 4. Terraformを設定・検証する
+### 4. AWS構成を設定・検証する場合
 
 初回のみ設定例をコピーし、`terraform/terraform.tfvars` を編集する。既存の設定ファイルがある場合はコピーを省略する。
 
@@ -209,7 +207,7 @@ OpenAPIの正本は [openapi/l3-management.openapi.yaml](openapi/l3-management.o
 bash tools/diagram.sh
 ```
 
-Python 3.9以上のみ必要。共通の `docs/architecture.tvg.json` を入力し、AWS4アイコンを使った編集可能な `docs/architecture-aws.drawio` を生成する。Textract/Bedrockはサービス利用を示す図用の型で、Terraformリソースの作成を意味しない。
+Dockerのみ必要。コンテナ内のPythonで共通の `docs/architecture.tvg.json` を読み込み、AWS4アイコンを使った編集可能な `docs/architecture-aws.drawio` を生成する。ホストにPythonをインストールする必要はない。Textract/Bedrockはサービス利用を示す図用の型で、Terraformリソースの作成を意味しない。
 
 両リポジトリの設計定義・生成スクリプト・draw.ioファイルを同一に保つ。`.drawio` は [diagrams.net](https://app.diagrams.net/) の「ファイルを開く」から編集できる。
 
