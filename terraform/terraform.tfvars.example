@@ -1,0 +1,11 @@
+project_name           = "point-award"
+environment            = "dev"
+aws_region             = "ap-northeast-1"
+management_aws_profile = "management-dev"
+management_account_id  = "111111111111"
+l3_account_id          = "222222222222"
+
+tags = {
+  Owner      = "campaign-platform-team"
+  CostCenter = "replace-me"
+}
