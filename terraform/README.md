@@ -51,4 +51,4 @@ terraform -chdir=terraform plan -var-file=environments/dev.tfvars
 
 ![L3アカウントと管理アカウントを分離したAWS構成図](../diagrams/aws-architecture.png)
 
-L3側の単一AZ・単一プライベートサブネット構成、およびVPC・AZ・サブネットとLambdaのVPC接続は目標構成であり、現時点のTerraformには未実装です。
+L3側のECR＋Lambdaコンテナ、Step Functions Standard、単一AZ・単一プライベートサブネット構成は目標構成であり、現時点のTerraformには未実装です。
