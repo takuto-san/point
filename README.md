@@ -46,9 +46,10 @@ docker run --rm -v "$(pwd):/work:ro" -w /work node:22-alpine \
 
 ### 4. AWS構成を設定・検証する場合
 
-初回のみ設定例をコピーし、`terraform/terraform.tfvars` を編集する。既存の設定ファイルがある場合はコピーを省略する。
+最初に仕様テンプレートからTerraformファイルを生成する。その後、設定例をコピーして `terraform/terraform.tfvars` を編集する。
 
 ```bash
+bash tools/terraform-generate.sh
 cp terraform/terraform.tfvars.example terraform/terraform.tfvars
 terraform -chdir=terraform init
 terraform -chdir=terraform fmt -check
@@ -80,7 +81,7 @@ terraform -chdir=terraform apply -var-file=terraform.tfvars
 terraform -chdir=terraform output -raw management_event_bus_arn
 ```
 
-出力したARNをpoint-l3の `management_event_bus_arn` へ設定する。構築順序は **point（管理側）→ point-l3（L3側）**。受信処理・適用の詳細は [terraform/README.md](terraform/README.md) を参照。
+出力したARNをpoint-l3の `management_event_bus_arn` へ設定する。構築順序は **point（管理側）→ point-l3（L3側）**。
 
 ## システム概要
 
@@ -134,22 +135,7 @@ point/
 ├── openapi/
 │   └── l3-management.openapi.yaml      # 管理側受信API・共通データ契約の正本
 ├── terraform/
-│   ├── versions.tf                    # Terraform・プロバイダのバージョン
-│   ├── providers.tf                   # 管理アカウントへの接続
-│   ├── variables.tf                   # 入力変数
-│   ├── locals.tf                      # 共通名・タグ
-│   ├── management.tf                  # EventBridge・SQS・DB・画面配信・認証基盤
-│   ├── api.tf                         # IAM認可の受信・受信票API
-│   ├── lambda.tf                      # 受信Lambda・IAM・イベントソース
-│   ├── outputs.tf                     # API URL・EventBridge ARN等
-│   ├── terraform.tfvars.example        # 設定例
-│   ├── .terraform.lock.hcl             # プロバイダの固定
-│   ├── .gitignore                      # ローカル設定・生成物を除外
-│   ├── README.md                       # 適用・受信処理の詳細
-│   └── lambda/
-│       ├── index.mjs                  # HTTP / SQSのエントリポイント
-│       ├── schema.mjs                 # OpenAPIスキーマ検証・正規化
-│       └── store.mjs                  # 版管理・受信票・トランザクション
+│   └── README.md                       # 構成図・生成後のディレクトリ構成
 ├── tests/
 │   └── receiver.test.mjs              # 再送・競合・確定後保留のテスト
 ├── tools/
@@ -158,6 +144,8 @@ point/
 │   ├── diagram-preview.sh             # TerravisionのPNG/SVGプレビューを生成
 │   ├── diagram-terraform.sh           # このリポジトリのTerraformだけを図示
 │   ├── diagram-providers.tf.txt        # Terraform図用の仮プロバイダ設定
+│   ├── terraform-generate.sh           # テンプレートからTerraform一式を生成
+│   ├── terraform/templates/            # Terraform・Lambdaの生成元
 │   ├── terravision.Dockerfile          # 日本語フォント対応の描画環境
 │   └── terravision-services.pth        # Textract/Bedrockの公式サービスアイコン名
 └── docs/
@@ -173,7 +161,7 @@ point/
     └── point-award-system-overview-with-screens.html
 ```
 
-生成物・ローカル設定の `.terraform/`、state、zip、`terraform.tfvars` はGit管理対象外。
+`terraform/`のREADME以外は生成物であり、`.tf`、`.terraform/`、state、zip、設定ファイルはGit管理対象外。
 
 ## 実装状況
 
