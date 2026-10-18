@@ -38,8 +38,6 @@ OpenAPIをzip作成時に同梱し、許可項目・型・必須項目を共通�
 
 ## 構成図
 
-プロジェクトルートで `bash tools/diagram.sh` を実行する。固定digestのTerravision公式DockerイメージでPNG/SVGを生成する。Terraform本体とプロバイダの取得にはネット接続が必要だが、図生成時にAWS認証情報やAWS APIを使用しない。
+READMEのAWS構成図はL3・管理アカウントを合わせた共通設計図。`bash tools/diagram.sh` でTerravisionの設計定義（`docs/architecture.tvg.json`）から生成し、追加予定のL3リソースも表示する。この管理側Terraformにそれらのリソースが追加されたわけではない。
 
-実インフラやstateは変更しない。planにはサンプルアカウントIDを使うため、図は設計レビュー用として扱う。
-
-図の対象は管理アカウント。L3の送信用IAMロールはpoint-l3のTerraformで管理するため、この図には含まない。Terravision 0.55.0の自動図はTerraformの依存関係を描き、API Gatewayの下位リソースも個別に表示される。
+このTerraformのplanから管理アカウントの定義だけを確認する場合は、プロジェクトルートで `bash tools/diagram-terraform.sh` を実行する。仮プロファイルの一時コピーを使い、`docs/terraform-architecture-aws.dot.png` / `.svg` を出力する。実インフラ・state・README用の共通図は変更しない。
