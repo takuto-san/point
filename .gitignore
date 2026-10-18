@@ -1,5 +1,3 @@
-**/terravision_override.tf
-**/tfdata.json
 terraform/*.tf
 terraform/.terraform.lock.hcl
 terraform/terraform.tfvars.example
