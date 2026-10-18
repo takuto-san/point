@@ -4,7 +4,7 @@
 
 他社解約金還元申請の精査結果を受信し、担当者による確認・確定と顧客への結果通知を支える管理システム。L3環境で証跡解析・本人確認・ポイント付与判定を行い、許可された結果だけを管理システムへ連携する。
 
-![解約金還元申請システムの全体像](docs/system-overview.png)
+![解約金還元申請システムの全体像](diagrams/system-overview.png)
 
 ## 1. 依存関係
 
@@ -27,7 +27,7 @@ cp terraform/terraform.tfvars.example terraform/terraform.tfvars
 terraform -chdir=terraform init
 terraform -chdir=terraform fmt -check
 terraform -chdir=terraform validate
-awsdac terraform/aws-architecture.yml --output docs/aws-architecture.png --force
+awsdac terraform/aws-architecture.yml --output diagrams/aws-architecture.png --force
 ```
 
 ## 3. ディレクトリ構成
@@ -44,13 +44,13 @@ point/
 │   ├── aws-architecture.yml
 │   ├── terraform.tfvars.example
 │   └── files/lambda/
-└── docs/
+└── diagrams/
     ├── aws-architecture.png
     └── system-overview.png
 ```
 
 ## 4. AWS構成図
 
-![AWS構成図](docs/aws-architecture.png)
+![AWS構成図](diagrams/aws-architecture.png)
 
 この図は目標構成です。VPC・AZ・サブネットとLambdaのVPC接続は現時点のTerraformには未実装です。
