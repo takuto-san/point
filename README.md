@@ -1,4 +1,4 @@
-# 解約金還元申請管理システム — point
+# 解約金還元申請管理システム
 
 ## 概要
 
@@ -10,7 +10,6 @@
 
 | 名前 | バージョン |
 |---|---|
-| Git | 2.x |
 | Docker / Docker Compose | Compose v2 |
 | Terraform | 1.6.0以上 |
 | AWS CLI | v2 |
