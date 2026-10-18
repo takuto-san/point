@@ -1,8 +1,8 @@
 FROM swaggerapi/swagger-ui:v5.25.3
 
-COPY openapi.yaml /spec/openapi.yaml
+COPY openapi.yml /spec/openapi.yml
 
-ENV SWAGGER_JSON=/spec/openapi.yaml
+ENV SWAGGER_JSON=/spec/openapi.yml
 
 EXPOSE 8080
 

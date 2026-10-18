@@ -12,7 +12,7 @@ data "archive_file" "receiver" {
 
   source {
     filename = "openapi.json"
-    content  = jsonencode(yamldecode(file("${path.module}/../openapi.yaml")))
+    content  = jsonencode(yamldecode(file("${path.module}/../openapi.yml")))
   }
 }
 
