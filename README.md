@@ -52,3 +52,5 @@ point/
 ## 4. AWS構成図
 
 ![AWS構成図](docs/aws-architecture.png)
+
+この図は目標構成です。VPC・AZ・サブネットとLambdaのVPC接続は現時点のTerraformには未実装です。
