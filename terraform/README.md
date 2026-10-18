@@ -4,23 +4,24 @@
 
 [L3アカウントと管理アカウントを分離したAWS構成図（draw.io）](../docs/architecture-aws.drawio)
 
-## 生成後のディレクトリ構成
+## ディレクトリ構成
 
 ```text
 terraform/
 ├── README.md
-├── versions.tf
-├── providers.tf
-├── variables.tf
-├── locals.tf
-├── management.tf
+├── main.tf
 ├── api.tf
 ├── lambda.tf
+├── variables.tf
 ├── outputs.tf
+├── locals.tf
+├── providers.tf
+├── versions.tf
 ├── terraform.tfvars.example
 ├── .terraform.lock.hcl
-└── lambda/
-    ├── index.mjs
-    ├── schema.mjs
-    └── store.mjs
+└── files/
+    └── lambda/
+        ├── index.mjs
+        ├── schema.mjs
+        └── store.mjs
 ```

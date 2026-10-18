@@ -6,7 +6,7 @@ data "archive_file" "receiver" {
     for_each = fileset("${path.module}/lambda", "*.mjs")
     content {
       filename = source.value
-      content  = file("${path.module}/lambda/${source.value}")
+      content  = file("${path.module}/files/lambda/${source.value}")
     }
   }
 

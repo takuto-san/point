@@ -1,4 +1,8 @@
-terraform/*.tf
-terraform/.terraform.lock.hcl
-terraform/terraform.tfvars.example
-terraform/lambda/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.zip
+terraform.tfvars
+*.auto.tfvars
+crash.log
